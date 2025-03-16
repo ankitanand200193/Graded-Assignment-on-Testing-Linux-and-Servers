@@ -59,5 +59,10 @@ grep CRON /var/log/syslog   # Check cron logs
 crontab -l                  # Verify cron jobs
 ```
 
+## **Terminal Result**
+
+![Alt text](Task_1_terminal_Output.png)
+
+
 **System monitoring is now automated & logging!**
 
