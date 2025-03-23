@@ -241,6 +241,258 @@ sudo chage -l Mike
   - `Mar 16 03:34` → Last modification date/time.
   - `/home/Mike/workspace` → The directory path.
 
+## **Terminal Results**
+
+
+ 
+# Task 3 : Automated Backup Configuration for Apache and Nginx Servers
+
+## **Objective**
+
+Automate the backup process for:
+
+- **Sarah’s Apache Server**
+- **Mike’s Nginx Server**
+
+## **Scenario**
+
+- Sarah manages an **Apache Web Server**.
+- Mike manages an **Nginx Web Server**.
+- Both require **scheduled backups** of configurations and document roots to ensure **data integrity and disaster recovery**.
+
+## **Backup Requirements**
+
+Each backup should:
+
+- Include configuration files and document root.
+- Be compressed and stored in `/backups/`.
+- Be scheduled for **every Tuesday at 12:00 AM**.
+- Include **integrity verification**.
+
+---
+
+# **Prerequisites**
+
+### **1. Create Backup Directory**
+
+Ensure the `/backups/` directory exists and is accessible:
+
+```bash
+sudo mkdir -p /backups
+sudo chmod 777 /backups
+```
+
+### **2. Install ********`tar`******** Utility**
+
+Ensure the `tar` command is installed:
+
+```bash
+sudo apt update && sudo apt install tar -y  # Debian/Ubuntu
+sudo yum install tar -y  # RHEL/CentOS
+```
+
+### **3. Verify Apache and Nginx Installation**
+
+For Apache:
+
+```bash
+sudo systemctl status httpd
+```
+
+For Nginx:
+
+```bash
+sudo systemctl status nginx
+```
+
+If not installed:
+
+```bash
+sudo apt install apache2 -y
+sudo yum install httpd -y
+sudo apt install nginx -y
+sudo yum install nginx -y
+```
+
+---
+
+# **Step 1: Create Backup Scripts**
+
+## **1.1 Apache Backup Script (Sarah)**
+
+Create the script:
+
+```bash
+sudo nano /usr/local/bin/apache_backup.sh
+```
+
+**Content:**
+
+```bash
+#!/bin/bash
+DATE=$(date +'%Y-%m-%d')
+BACKUP_DIR="/backups"
+APACHE_CONF="/etc/apache2/apache2.conf"
+APACHE_HTML="/var/www/html/"
+BACKUP_FILE="$BACKUP_DIR/apache_backup_$DATE.tar.gz"
+LOG_FILE="$BACKUP_DIR/apache_backup.log"
+
+tar -czf "$BACKUP_FILE" -C / etc/apache2/apache2.conf
+
+if tar -tzf "$BACKUP_FILE" &>/dev/null; then
+    echo "$DATE - Apache backup successful: $BACKUP_FILE" >> "$LOG_FILE"
+else
+    echo "$DATE - Apache backup failed!" >> "$LOG_FILE"
+fi
+```
+
+Make it executable:
+
+```bash
+sudo chmod +x /usr/local/bin/apache_backup.sh
+```
+
+## **1.2 Nginx Backup Script (Mike)**
+
+Create the script:
+
+```bash
+sudo nano /usr/local/bin/nginx_backup.sh
+```
+
+**Content:**
+
+```bash
+#!/bin/bash
+DATE=$(date +'%Y-%m-%d')
+BACKUP_DIR="/backups"
+NGINX_CONF="/etc/nginx/"
+NGINX_HTML="/usr/share/nginx/html/"
+BACKUP_FILE="$BACKUP_DIR/nginx_backup_$DATE.tar.gz"
+LOG_FILE="$BACKUP_DIR/nginx_backup.log"
+
+tar -czf "$BACKUP_FILE" "$NGINX_CONF" "$NGINX_HTML"
+
+if tar -tzf "$BACKUP_FILE" &>/dev/null; then
+    echo "$DATE - Nginx backup successful: $BACKUP_FILE" >> "$LOG_FILE"
+else
+    echo "$DATE - Nginx backup failed!" >> "$LOG_FILE"
+fi
+```
+
+Make it executable:
+
+```bash
+sudo chmod +x /usr/local/bin/nginx_backup.sh
+```
+
+---
+
+# **Step 2: Schedule the Cron Jobs**
+
+Edit the cron job file:
+
+```bash
+crontab -e
+```
+
+For **Sarah (Apache backup)**:
+
+```
+0 0 * * 2 /usr/local/bin/apache_backup.sh
+```
+
+For **Mike (Nginx backup)**:
+
+```
+0 0 * * 2 /usr/local/bin/nginx_backup.sh
+```
+
+- `0 0 * * 2` → Runs **every Tuesday at 12:00 AM**.
+
+---
+
+# **Step 3: Verify the Backups**
+
+### **3.1 Test Scripts Manually**
+
+For Apache:
+
+```bash
+sudo  /usr/local/bin/apache_backup.sh
+```
+
+For Nginx:
+
+```bash
+sudo /usr/local/bin/nginx_backup.sh
+```
+
+### **3.2 Check Backup Files**
+
+```bash
+ls -lh /backups/
+```
+
+Expected Output:
+
+```
+-rw-r--r-- 1 root root  5.0M Mar 16 00:00 apache_backup_YYYY-MM-DD.tar.gz
+-rw-r--r-- 1 root root  4.2M Mar 16 00:00 nginx_backup_YYYY-MM-DD.tar.gz
+```
+
+### **3.3 Verify Backup Logs**
+
+```bash
+cat /backups/apache_backup.log
+cat /backups/nginx_backup.log
+```
+
+Expected Output:
+
+```
+2025-03-16 - Apache backup successful: /backups/apache_backup_YYYY-MM-DD.tar.gz
+2025-03-16 - Nginx backup successful: /backups/nginx_backup_YYYY-MM-DD.tar.gz
+```
+
+### **3.4 Verify Backup Integrity**
+
+```bash
+tar -tzf /backups/apache_backup_YYYY-MM-DD.tar.gz
+tar -tzf /backups/nginx_backup_YYYY-MM-DD.tar.gz
+```
+
+No errors mean the backup is valid.
+
+## **Terminal Results**
+
+
+# **Color Coding in Terminal**
+
+If you see `.tar.gz` files appearing **red** in your terminal output, this is normal.
+
+### **Why Are They Red?**
+
+The color coding depends on your terminal’s **LS\_COLORS** setting:
+
+- **Red** → Compressed files (`.tar.gz`, `.zip`, `.rar`).
+- **Blue** → Directories.
+- **Green** → Executable files.
+
+✅ **No issues here! Your backup files look fine.** 🚀
+
+---
+
+# **Final Summary**
+
+✔ **Backup scripts created** for Apache and Nginx.\
+✔ **Cron jobs scheduled** for every Tuesday at 12:00 AM.\
+✔ **Backup files stored** in `/backups/` with timestamps.\
+✔ **Verification logs generated** for tracking success/failure.
+
+
+
+
 
 
 
