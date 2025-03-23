@@ -243,6 +243,7 @@ sudo chage -l Mike
 
 ## **Terminal Results**
 
+! [Alt text ](Task_2_User_Management.png)
 
  
 # Task 3 : Automated Backup Configuration for Apache and Nginx Servers
