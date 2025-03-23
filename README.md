@@ -468,6 +468,7 @@ No errors mean the backup is valid.
 
 ## **Terminal Results**
 
+![Alt text ](server_backup_terminal.png)
 
 # **Color Coding in Terminal**
 
